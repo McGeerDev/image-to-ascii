@@ -8,13 +8,12 @@ import (
 )
 
 func init() {
-	// damn important or else At(), Bounds() functions will
-	// caused memory pointer error!!
+	// Registering the jpeg format so the image interface
+	// Knows how to decode the jpeg image
 	image.RegisterFormat("jpeg", "jpeg", jpeg.Decode, jpeg.DecodeConfig)
 }
 
 func main() {
-
 	file, err := os.Open("image.jpeg")
 	if err != nil {
 		fmt.Println(err)
@@ -23,6 +22,7 @@ func main() {
 
 	defer file.Close()
 
+	// The second return value is the format of the image
 	imgCfg, _, err := image.DecodeConfig(file)
 	if err != nil {
 		fmt.Println(err)
@@ -35,6 +35,7 @@ func main() {
 	fmt.Println("Width:", width)
 	fmt.Println("Height:", height)
 
+	// Without this line there is a memory out of bounds error
 	file.Seek(0, 0)
 
 	img, _, err := image.Decode(file)
@@ -46,7 +47,6 @@ func main() {
 	}
 	defer destinationFile.Close()
 
-	fmt.Println(img.At(10, 10).RGBA())
 	for y := range height {
 		for x := range width {
 			r, g, b, a := img.At(x, y).RGBA()
@@ -74,6 +74,5 @@ func getAsciiChar(brightness uint32) string {
 	pixel := float32(brightness) / 255 * float32(amountOfPixels-1)
 	var pix int = int(pixel)
 
-	fmt.Println(pix)
 	return asciiPixels[pix]
 }
